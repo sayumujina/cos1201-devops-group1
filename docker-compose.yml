@@ -42,6 +42,7 @@ version: '3.8'
 services:
   # STUDENT TODO: Define frontend service
   frontend:
+    image: sayumujina/frontend
     build: ./frontend
     ports:
       - "3000:3000"
@@ -50,6 +51,7 @@ services:
 
   # STUDENT TODO: Define backend service
   backend:
+    image: sayumujina/backend
     build: ./backend
     ports:
       - "8080:8080"
