@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      db:
+      postgres:
         image: postgres:15-alpine
         env:
           POSTGRES_DB: mydb
@@ -51,22 +51,20 @@ jobs:
       - name: Install frontend dependencies
         run: cd frontend && npm ci
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
-      - name: Start services
-        run: docker-compose up -d backend frontend
-
       - name: Run tests
-        run: docker-compose exec backend npm test
+        run: |
+          docker run --rm \
+            --network host \
+            -e NODE_ENV=test \
+            -e POSTGRES_HOST=localhost \
+            -e POSTGRES_PORT=5432 \
+            -e POSTGRES_DB=mydb \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=example \
+            nodejs-app-test:latest
         env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: mydb
-          DB_USER: postgres
-          DB_PASSWORD: example
+          CI: true
+        timeout-minutes: 10
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
