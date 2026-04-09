@@ -64,17 +64,17 @@ jobs:
       - name: Debug environment
         run: |
           cd backend
-          node -e "console.log('DB Config:', process.env.POSTGRES_HOST, process.env.POSTGRES_PORT, process.env.POSTGRES_DB)"
+          node -e "console.log('DB Config:', process.env.DB_HOST, process.env.DB_PORT, process.env.DB_NAME)"
 
       - name: Run tests
         run: cd backend && npm test
         env:
           NODE_ENV: test
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_DB: mydb
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: example
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: mydb
+          DB_USER: postgres
+          DB_PASSWORD: example
           CI: true
         timeout-minutes: 10
 
