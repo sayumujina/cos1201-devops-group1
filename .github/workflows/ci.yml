@@ -61,6 +61,11 @@ jobs:
           echo "Checking if data was loaded..."
           PGPASSWORD=example psql -h localhost -U postgres -d mydb -c "\dt"
 
+      - name: Debug environment
+        run: |
+          cd backend
+          node -e "console.log('DB Config:', process.env.POSTGRES_HOST, process.env.POSTGRES_PORT, process.env.POSTGRES_DB)"
+
       - name: Run tests
         run: cd backend && npm test
         env:
