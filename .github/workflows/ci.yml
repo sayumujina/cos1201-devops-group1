@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      db:
+      postgres:
         image: postgres:15-alpine
         env:
           POSTGRES_DB: mydb
@@ -29,27 +29,85 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js  
-        uses: actions/setup-node@v4
+      - name: Cache backend npm dependencies
+        uses: actions/cache@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          path: backend/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-backend-
 
-      - name: Install dependencies
-        run: npm ci 
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+        
+      - name: Cache frontend npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Setup database
+        run: |
+          echo "Loading database schema..."
+          PGPASSWORD=example psql -h localhost -U postgres -d mydb -f database/database.sql
+          echo "Checking if data was loaded..."
+          PGPASSWORD=example psql -h localhost -U postgres -d mydb -c "\dt"
 
       - name: Run tests
-        run: docker-compose exec backend npm test
+        run: cd backend && npm test
         env:
-          DB_HOST: postgres
+          NODE_ENV: test
+          DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: mydb
           DB_USER: postgres
           DB_PASSWORD: example
-        
-      - name: Build Docker images
-        run: docker-compose build
+          CI: true
+        timeout-minutes: 10
 
-      - name: Run Docker Compose
-        run: docker-compose push sayumujina/backend
-        run: docker-compose push sayumujina/frontend
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
+
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/cos1201-devops-group1
+            sudo git pull origin main 
+            sudo docker-compose pull 
+            sudo docker-compose up -d
