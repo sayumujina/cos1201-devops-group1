@@ -51,6 +51,10 @@ jobs:
       - name: Install frontend dependencies
         run: cd frontend && npm ci
 
+      - name: Setup database
+        run: |
+          PGPASSWORD=example psql -h localhost -U postgres -d mydb -f database/database.sql
+
       - name: Run tests
         run: cd backend && npm test
         env:
