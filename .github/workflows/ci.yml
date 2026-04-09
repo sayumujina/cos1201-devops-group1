@@ -51,8 +51,16 @@ jobs:
       - name: Install frontend dependencies
         run: cd frontend && npm ci
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Start services
+        run: docker-compose up -d backend frontend
+
       - name: Run tests
-        run: cd backend && npm test
+        run: docker-compose exec backend npm test
         env:
           DB_HOST: localhost
           DB_PORT: 5432
