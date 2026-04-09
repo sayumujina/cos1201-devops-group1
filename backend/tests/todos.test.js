@@ -81,6 +81,7 @@ describe('Todos API', () => {
       expect(updateRes.body.title).toBe('Updated title');
       expect(updateRes.body.completed).toBe(true);
 
+   });
       // Stop the server and close DB connection after tests
       afterAll(async () => {
          // Close the database connection pool
@@ -88,6 +89,5 @@ describe('Todos API', () => {
          if (app.locals && app.locals.pool) {
             await app.locals.pool.end();
          }
-   });
    });
 });
