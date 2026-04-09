@@ -52,7 +52,7 @@ jobs:
         run: cd frontend && npm ci
 
       - name: Run tests
-        run: cd backend && cd test && npm test
+        run: cd backend && npm test
         env:
           DB_HOST: localhost
           DB_PORT: 5432
