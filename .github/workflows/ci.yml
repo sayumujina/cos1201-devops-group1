@@ -51,9 +51,15 @@ jobs:
       - name: Install frontend dependencies
         run: cd frontend && npm ci
 
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
       - name: Setup database
         run: |
+          echo "Loading database schema..."
           PGPASSWORD=example psql -h localhost -U postgres -d mydb -f database/database.sql
+          echo "Checking if data was loaded..."
+          PGPASSWORD=example psql -h localhost -U postgres -d mydb -c "\dt"
 
       - name: Run tests
         run: cd backend && npm test
