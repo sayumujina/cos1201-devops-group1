@@ -58,20 +58,20 @@ app.post('/api/todos', async (req, res) => {
 // BUG #3: Missing DELETE endpoint - but test expects it!
 // STUDENT TODO: Implement DELETE /api/todos/:id endpoint
 
-app.delete('/api/todos/:id', async (req, res) => {
-   try {
-      const { id } = req.params;
-      const result = await pool.query('DELETE FROM todos WHERE id = $1 RETURNING *', [id]);
-      if (result.rows.length === 0) {
-         return res.status(404).json({ error: 'Todo not found' });
-      }
+// app.delete('/api/todos/:id', async (req, res) => {
+//    try {
+//       const { id } = req.params;
+//       const result = await pool.query('DELETE FROM todos WHERE id = $1 RETURNING *', [id]);
+//       if (result.rows.length === 0) {
+//          return res.status(404).json({ error: 'Todo not found' });
+//       }
 
-      res.json({ message: 'Todo deleted successfully' });
+//       res.json({ message: 'Todo deleted successfully' });
 
-   } catch (err) {
-      res.status(500).json({ error: err.message });
-   }
-});
+//    } catch (err) {
+//       res.status(500).json({ error: err.message });
+//    }
+// });
 
 
 // BUG #4: Missing PUT endpoint for updating todos
@@ -97,11 +97,11 @@ const port = process.env.PORT || 8080;
 
 // BUG #5: Server starts even in test mode, causing port conflicts
 // STUDENT FIX: Only start server if NOT in test mode
-
-app.listen(port, () => {
-   console.log(`Backend running on port ${port}`);
-});
-
+if (process.env.NODE_ENV !== 'test') {
+   app.listen(port, () => {
+      console.log(`Backend running on port ${port}`);
+   });
+};
 
 // BUG #6: App not exported - tests can't import it!
 // STUDENT FIX: Export the app module
