@@ -80,5 +80,14 @@ describe('Todos API', () => {
       expect(updateRes.status).toBe(200);  // Will FAIL - 404!
       expect(updateRes.body.title).toBe('Updated title');
       expect(updateRes.body.completed).toBe(true);
+
+   });
+      // Stop the server and close DB connection after tests
+      afterAll(async () => {
+         // Close the database connection pool
+         const app = require('../server');
+         if (app.locals && app.locals.pool) {
+            await app.locals.pool.end();
+         }
    });
 });

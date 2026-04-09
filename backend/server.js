@@ -57,7 +57,6 @@ app.post('/api/todos', async (req, res) => {
 
 // BUG #3: Missing DELETE endpoint - but test expects it!
 // STUDENT TODO: Implement DELETE /api/todos/:id endpoint
-
 app.delete('/api/todos/:id', async (req, res) => {
    try {
       const { id } = req.params;
