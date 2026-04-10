@@ -108,7 +108,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/cos1201-devops-group1
-            sudo git pull origin main 
-            sudo docker-compose pull 
-            sudo service postgresql stop
+            sudo git pull origin main
+            sudo docker-compose pull
+            sudo systemctl stop postgresql
             sudo docker-compose up -d
