@@ -93,6 +93,16 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
 
+      - name: Stop existing containers on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/cos1201-devops-group1
+            sudo docker-compose down || true
+
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
