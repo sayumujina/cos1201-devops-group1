@@ -75,7 +75,7 @@ function App() {
         <ul>
           <li>Dockerfile (multi-stage)</li>
           <li>Fix backend validation (broken test)</li>
-          <li>CI/CD pipeline</li>
+          <li>CI/CD pipelineeeeee</li>
           <li>REPORT.md + Slides</li>
         </ul>
       </div>
