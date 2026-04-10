@@ -108,7 +108,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/cos1201-devops-group1
+            echo "Checking what's using port 5432:"
+            sudo netstat -tulpn | grep :5432 || echo "Port 5432 is free"
+            echo "Checking existing Docker containers:"
+            sudo docker ps -a | grep postgres || echo "No postgres containers found"
             sudo git pull origin main
             sudo docker-compose pull
-            sudo systemctl stop postgresql
             sudo docker-compose up -d
