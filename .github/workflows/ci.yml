@@ -109,7 +109,14 @@ jobs:
           port: ${{ secrets.SSH_PORT || '22' }}
           script: |
             cd /var/www/cos1201-devops-group1
+            echo "Checking Docker status..."
+            sudo systemctl status docker || echo "Docker service check failed"
+            echo "Starting Docker if needed..."
+            sudo systemctl start docker || echo "Docker start failed"
+            echo "Checking Docker version..."
+            sudo docker --version || echo "Docker not accessible"
+            echo "Proceeding with deployment..."
             sudo git pull origin main
-            sudo docker-compose down --remove-orphans
+            sudo docker-compose down --remove-orphans || true
             sudo docker-compose pull
             sudo docker-compose up -d --force-recreate
